@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ramazon Taqvimi Qashqadaryo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #00000d;
+        }
+        heading {
+            display: block;
+            margin-bottom: 20px;
+        }
+        h1, h3 {
+            color: #0000c0;
+            margin: 10px 0;
+        }
+        table {
+            margin: 0 auto;
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid rgb(0, 0, 0);
+            padding: 10px;
+            color: white;
+            width: 33.33%;
+        }
+        th {
+            background-color: #00008b;
+            color: rgb(255, 255, 255);
+        }
+        tr.current-day {
+            box-shadow: 0 0 10px rgba(0, 0, 0);
+            background-color: #00008b;
+        }
+        tr:hover{
+            background-color: #00008b;
+            color: rgb(255, 255, 255);
+        }
+    </style>
+</head>
+<body>
+    <heading>
+        <div>
+            <h1>Qashqadaryo Ramazon Taqvimi</h1>
+            <h1 id="nearest-event">Loading...</h1>
+            <h3>Qolgan vaqt:</h3>   
+            <h3 id="remaining-time">Loading...</h3>
+        </div>
+    </heading>
+    <main>
+        <table>
+            <thead>
+                <tr>
+                    <th>Kun</th>
+                    <th>Saharlik</th>
+                    <th>Iftorlik</th>
+                </tr>
+            </thead>
+            <tbody id="timetable">
+                <!-- Table rows will be inserted dynamically -->
+            </tbody>
+        </table>
+    </main>
+
+    <script>
+        // Ramadan timetable data based on the provided image
+        const timetableData = [
+            { day: 1, saharlik: "05:52", iftorlik: "18:28" },
+            { day: 2, saharlik: "05:50", iftorlik: "18:29" },
+            { day: 3, saharlik: "05:49", iftorlik: "18:30" },
+            { day: 4, saharlik: "05:47", iftorlik: "18:31" },
+            { day: 5, saharlik: "05:45", iftorlik: "18:32" },
+            { day: 6, saharlik: "05:44", iftorlik: "18:33" },
+            { day: 7, saharlik: "05:42", iftorlik: "18:35" },
+            { day: 8, saharlik: "05:41", iftorlik: "18:36" },
+            { day: 9, saharlik: "05:39", iftorlik: "18:37" },
+            { day: 10, saharlik: "05:37", iftorlik: "18:38" },
+            { day: 11, saharlik: "05:36", iftorlik: "18:39" },
+            { day: 12, saharlik: "05:34", iftorlik: "18:40" },
+            { day: 13, saharlik: "05:32", iftorlik: "18:41" },
+            { day: 14, saharlik: "05:30", iftorlik: "18:43" },
+            { day: 15, saharlik: "05:29", iftorlik: "18:44" },
+            { day: 16, saharlik: "05:27", iftorlik: "18:45" },
+            { day: 17, saharlik: "05:25", iftorlik: "18:46" },
+            { day: 18, saharlik: "05:24", iftorlik: "18:47" },
+            { day: 19, saharlik: "05:22", iftorlik: "18:48" },
+            { day: 20, saharlik: "05:20", iftorlik: "18:49" },
+            { day: 21, saharlik: "05:18", iftorlik: "18:50" },
+            { day: 22, saharlik: "05:16", iftorlik: "18:51" },
+            { day: 23, saharlik: "05:15", iftorlik: "18:52" },
+            { day: 24, saharlik: "05:13", iftorlik: "18:53" },
+            { day: 25, saharlik: "05:11", iftorlik: "18:54" },
+            { day: 26, saharlik: "05:09", iftorlik: "18:55" },
+            { day: 27, saharlik: "05:07", iftorlik: "18:56" },
+            { day: 28, saharlik: "05:06", iftorlik: "18:57" },
+            { day: 29, saharlik: "05:04", iftorlik: "18:58" },
+            { day: 30, saharlik: "05:02", iftorlik: "18:59" }
+        ];
+
+        // Populate the table with data
+        function populateTable() {
+            const tbody = document.getElementById("timetable");
+            timetableData.forEach((data, index) => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${data.day}</td>
+                    <td>${data.saharlik}</td>
+                    <td>${data.iftorlik}</td>
+                `;
+                if (index + 1 === getCurrentDay()) {
+                    row.classList.add("current-day");
+                }
+                tbody.appendChild(row);
+            });
+        }
+
+        // Calculate the current day of Ramadan (assuming start date is March 1, 2025)
+        function getCurrentDay() {
+            const startDate = new Date("2025-03-01");
+            const currentDate = new Date();
+            const diffTime = currentDate - startDate;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            return diffDays > 0 && diffDays <= 30 ? diffDays : 1;
+        }
+
+        // Determine the next event (Saharlik or Iftorlik)
+        function getNextEvent() {
+            const currentDay = getCurrentDay();
+            const data = timetableData[currentDay - 1];
+            const now = new Date();
+            const saharlikTime = new Date(now.toDateString() + " " + data.saharlik + ":00");
+            const iftorlikTime = new Date(now.toDateString() + " " + data.iftorlik + ":00");
+
+            if (now < saharlikTime) {
+                return { event: "Saharlik", time: saharlikTime, display: `Saharlik ${data.saharlik}` };
+            } else if (now < iftorlikTime) {
+                return { event: "Iftorlik", time: iftorlikTime, display: `Iftorlik ${data.iftorlik}` };
+            } else {
+                const nextDay = currentDay < 30 ? currentDay + 1 : 1;
+                const nextData = timetableData[nextDay - 1];
+                const nextSaharlikTime = new Date(now.toDateString() + " " + nextData.saharlik + ":00");
+                nextSaharlikTime.setDate(nextSaharlikTime.getDate() + 1);
+                return { event: "Saharlik", time: nextSaharlikTime, display: `Saharlik ${nextData.saharlik} (Tomorrow)` };
+            }
+        }
+
+        // Update the timer and nearest event display
+        function updateTimer() {
+            const nextEvent = getNextEvent();
+            const now = new Date();
+            const timeDiff = nextEvent.time - now;
+
+            if (timeDiff <= 0) {
+                location.reload(); // Reload to update to the next event
+            }
+
+            const hours = Math.floor(timeDiff / (1000 * 60 * 60));
+            const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+
+            document.getElementById("nearest-event").textContent = nextEvent.display;
+            document.getElementById("remaining-time").textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // Initialize the page
+        populateTable();
+        updateTimer();
+        setInterval(updateTimer, 1000); // Update every second
+    </script>
+</body>
+</html>

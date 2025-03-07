@@ -141,7 +141,7 @@
                 const nextData = timetableData[nextDay - 1];
                 const nextSaharlikTime = new Date(now.toDateString() + " " + nextData.saharlik + ":00");
                 nextSaharlikTime.setDate(nextSaharlikTime.getDate() + 1);
-                return { event: "Saharlik", time: nextSaharlikTime, display: `Saharlik ${nextData.saharlik} (Tomorrow)` };
+                return { event: "Saharlik", time: nextSaharlikTime, display: `Saharlik ${nextData.saharlik} (Ertaga)` };
             }
         }
 
